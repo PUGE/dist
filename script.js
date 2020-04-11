@@ -13,6 +13,7 @@ function next() {
 
 var Slide = {
   init: function (domBox, container, slideName, autoPlay) {
+    var _this = this
     if (!domBox) return
     // 初始化样式
     this.addStyle()
@@ -49,7 +50,25 @@ var Slide = {
       this.container.insertBefore(last, this.container.childNodes[0])
     }
     // 判断是否自动播放
-    if (autoPlay) this.autoPlay(autoPlay)
+    if (autoPlay) {
+      this.startAutoPlay(autoPlay)
+      // 鼠标悬浮停止轮播
+      this.addEventListener(this.container, 'mouseover', function (e) {
+        setTimeout(function() {
+          _this.stopAutoPlay()
+        }, 0);
+      })
+      // 鼠标移出开始轮播
+      this.addEventListener(this.container, 'mouseout', function (e) {
+        setTimeout(function() {
+          if (_this.clock == undefined) _this.startAutoPlay(autoPlay)
+        }, 0);
+      })
+      // 当前窗口得到焦点
+      // window.onfocus = _this.startAutoPlay(autoPlay)
+      // // 当前窗口失去焦点
+      // window.onblur = _this.stopAutoPlay()
+    }
   },
   next: function () {
     var _this = this
@@ -89,12 +108,20 @@ var Slide = {
       _this.isBusy = false
     }, 3000);
   },
-  autoPlay: function (interval) {
+  startAutoPlay: function (interval) {
+    if (this.clock != undefined) return
+    // console.log('开始自动播放')
     var _this = this
     this.clock = setInterval(function () {
-      console.log('自动播放!')
+      // console.log('自动播放!')
       if (!_this.isBusy) this.next()
     }, interval);
+  },
+  stopAutoPlay: function () {
+    if (this.clock == undefined) return
+    // console.log('停止自动播放')
+    clearInterval(this.clock)
+    this.clock = undefined
   },
   // 兼容IE添加class
   addClass: function (dom, className) {
@@ -104,6 +131,14 @@ var Slide = {
       dom.className += " " + className
     }
   },
+  // 兼容IE的事件监听
+  addEventListener: function (dom, name, func) {
+    if (dom.attachEvent) {    
+      dom.attachEvent(name, func);    
+    } else if (window.addEventListener) {    
+      dom.addEventListener(name, func, false);      
+    }  
+  },
   // 兼容IE的appendChild
   appendChild: function (dom, appendDom) {
     if (dom.append) {
@@ -112,6 +147,7 @@ var Slide = {
       dom.appendChild(appendDom)
     }
   },
+  // 添加必要的css代码
   addStyle: function() {
     var styleElement = document.getElementById('peopleSlideStyle');
     if (!styleElement) {
