@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Slider</title>
+  <style>
+    .slider {
+      width: 655px;
+      height: 414px;
+      overflow: hidden;
+      position: relative;
+    }
+    .control_prev, .control_next {
+      position: absolute;
+      bottom: 18px;
+      z-index: 999;
+      display: block;
+      width: auto;
+      height: auto;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 18px;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+    .control_prev {
+      left: 80px;
+    }
+    .control_next {
+      right: 80px;
+    }
+    .slider ul li span {
+      position: absolute;
+      line-height: 60px;
+      bottom: 0;
+      width: 100%;
+      background-color: black;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      text-align: center;
+      font-size: 16px;
+    }
+    .number-pagination {
+      position: absolute;
+      color: white;
+      z-index: 9;
+      left: 110px;
+      bottom: 14px;
+      font-size: 20px;
+      letter-spacing: 4px;
+    }
+    .number-pagination .active-index {
+      font-size: 28px;
+      color: #e71f18;
+    }
+
+    /* 视频播放容器 */
+    .video-box {
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 999;
+      display: none;
+    }
+    .play-video-button {
+      width: 60px;
+      height: 60px;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      cursor: pointer;
+      background-image: url('./play.png');
+    }
+    .close-video {
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: white;
+      font-size: 14px;
+      line-height: 20px;
+      margin: 5px 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<h2>结合视频播放的轮播图</h2>
+<div id="slider2" class="slider">
+  <img class="control_next" src="http://www.people.com.cn/img/2016people/images/focus_right_b.png">
+  <img class="control_prev" src="http://www.people.com.cn/img/2016people/images/focus_left_b.png">
+  <!-- 数字分页器 -->
+  <div class="number-pagination"></div>
+  <ul>
+    <li>
+      <img src="http://www.people.com.cn/NMediaFile/2020/0411/MAIN202004111118448686818103895.jpg">
+      <span>沪通铁路开始接触网冷滑试验</span>
+      <div class="play-video-button" onclick="playVideo('/pvservice/xml/2020/4/11/7313b086-a3ff-40fc-8fb9-06ee2e1799c9.xml')"></div>
+    </li>
+    <li>
+      <a href="#">
+        <img src="http://www.people.com.cn/NMediaFile/2020/0411/MAIN202004111118457878410502828.jpg">
+        <span>北京八达岭长城山花烂漫</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <img src="http://www.people.com.cn/NMediaFile/2020/0411/MAIN202004111147086804369605689.jpg">
+        <span>淮北南湖：雨后牡丹醉游人</span>
+        <div class="play-video-button" onclick="playVideo('/pvservice/xml/2020/4/7/6d1d3d73-6f50-47a9-93af-046984522b3e.xml')"></div>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <img src="http://www.people.com.cn/NMediaFile/2020/0411/MAIN202004111118443265201331851.jpg">
+        <span>沪通铁路开始接触网冷滑试验</span>
+      </a>
+    </li>
+  </ul>
+  <!-- 播放视频的容器 -->
+  <div class="video-box">
+    <div class="video-play"></div>
+    <!-- 视频右上角关闭按钮 -->
+    <div class="close-video" onclick="stopVideoPlay()">关闭视频</div>
+  </div>
+</div>
+
+<script src="http://tv.people.com.cn/img/player/v.js"></script>
+<!-- <script>showPlayer({id:"/pvservice/xml/2020/4/11/7313b086-a3ff-40fc-8fb9-06ee2e1799c9.xml",width:800,height:495});</script> -->
+<!-- partial -->
+<script  src="./slide.js"></script>
+<script  src="./peopleVideo.js"></script>
+<script>
+  var slide = null
+  function playVideo (id) {
+    var videoBox = document.querySelector('.video-box')
+    // 显示
+    videoBox.style.display = 'block'
+    // 停止自动轮播
+    if (slide) slide.stopAutoPlay()
+    showPlayerBox({
+      id: id,
+      // width: 800,
+      // height: 495,
+      // 播放视频的盒子
+      box: videoBox.querySelector('.video-play')
+    });
+  }
+  function stopVideoPlay () {
+    var videoBox = document.querySelector('.video-box')
+    // 显示
+    videoBox.style.display = 'none'
+    videoBox.querySelector('.video-play').innerHTML = ''
+    // 开启自动轮播
+    if (slide) slide.startAutoPlay(3000)
+  }
+  window.onload = function () {
+    slide = new Slide(document.getElementById('slider2'), 'ul', 'li', {
+      // 自动播放间隔
+      autoPlay: 3000,
+      // 切换下一个轮播图的class或ID
+      nextEl: ".control_next",
+      // 切换上一个轮播图的class或ID
+      prevEl: ".control_prev",
+      // 数字分页器
+      numberPaginationEL: ".number-pagination",
+      // 轮播图改变回调
+      // onSlideChange: function (slide) {
+      //   console.log(slide.activeIndex)
+      // }
+    })
+
+    // showPlayerBox({
+    //   id: "/pvservice/xml/2020/4/11/7313b086-a3ff-40fc-8fb9-06ee2e1799c9.xml",
+    //   // width: 800,
+    //   // height: 495,
+    //   box: document.getElementById('videoBox')
+    // });
+  }
+</script>
+</body>
+</html>
